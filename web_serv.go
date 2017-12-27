@@ -1,13 +1,15 @@
 package main
 
 import (
-	"./adsb"
 	"encoding/json"
+	"flyght/adsb"
+	"flyght/publisher"
 	"fmt"
-	"github.com/confluentinc/confluent-kafka-go/kafka"
 	"io/ioutil"
 	"log"
 	"net/http"
+
+	"github.com/confluentinc/confluent-kafka-go/kafka"
 )
 
 func handler(w http.ResponseWriter, r *http.Request) {
@@ -17,10 +19,13 @@ func handler(w http.ResponseWriter, r *http.Request) {
 
 }
 
+const (
+	adsbExchangeURL = "http://public-api.adsbexchange.com/VirtualRadar/AircraftList.json?lat=33.433638&lng=-112.008113&fDstL=0&fDstU=100"
+)
+
 func main() {
-	url := "http://public-api.adsbexchange.com/VirtualRadar/AircraftList.json?lat=33.433638&lng=-112.008113&fDstL=0&fDstU=100"
 	fmt.Println("Reading plane list")
-	resp, err := http.Get(url)
+	resp, err := http.Get(adsbExchangeURL)
 
 	if err != nil {
 
@@ -47,7 +52,8 @@ func main() {
 	} else {
 	}
 
-	p, err := kafka.NewProducer(&kafka.ConfigMap{"bootstrap.servers": "10.4.200.9:9092"})
+	//p, err := kafka.NewProducer(&kafka.ConfigMap{"bootstrap.servers": "10.4.200.9:9092"})
+	p, err := publisher.New()
 	if err != nil {
 		panic(err)
 	} else {
@@ -63,9 +69,9 @@ func main() {
 
 		fmt.Println("----------------------------Sending message to kafka queue-------------------------------")
 
-		p.ProduceChannel() <- &kafka.Message{TopicPartition: kafka.TopicPartition{Topic: &topic, Partition: kafka.PartitionAny}, Value: []byte(acJson)}
+		p.Producer.ProduceChannel() <- &kafka.Message{TopicPartition: kafka.TopicPartition{Topic: &topic, Partition: kafka.PartitionAny}, Value: []byte(acJson)}
 		fmt.Println(ac)
 	}
-	p.Close()
+	p.Producer.Close()
 
 }
