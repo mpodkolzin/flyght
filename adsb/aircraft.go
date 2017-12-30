@@ -1,53 +1,53 @@
 package adsb
 
 type Aircraft struct {
-	Id           int
-	Rcvr         int
-	HasSig       bool
-	Icao         string
-	Bad          bool
-	Reg          string
-	FSeen        string
-	TSecs        float32
-	CMsgs        float32
-	Alt          float32
-	GAlt         float32
-	InHg         float32
-	AltT         float32
-	Call         string
-	Lat          float32
-	Long         float32
-	PosTime      uint64
-	Mlat         bool
-	Tisb         bool
-	Spd          float32
-	Trak         float32
-	TrkH         bool
-	Type         string
-	Mdl          string
-	Man          string
-	CNun         string
-	Op           string
-	OpIcao       string
-	Sqk          string
-	Help         bool
-	Vsi          int //???
-	VsiT         int //???
-	Dst          float32
-	Brng         float32
-	WTC          int
-	Species      float32
-	Engines      string
-	EngType      int
-	EngMount     int
-	Mil          bool
-	Cou          string
-	HasPic       bool
-	Interested   bool
-	FlightsCount int
-	Gnd          bool
-	SpdTyp       int
-	CallSus      bool
-	Trt          int
-	Year         string
+	Id           int     `json: "id"`
+	Rcvr         int     `json: "rcvr"`
+	HasSig       bool    `json: "hassig"`
+	Icao         string  `json: "icao"`
+	Bad          bool    `json: "bad"`
+	Reg          string  `json: "reg"`
+	FSeen        string  `json: "fseen"`
+	TSecs        float32 `json: "tsecs"`
+	CMsgs        float32 `json: "cmsgs"`
+	Alt          float32 `json: "alt"`
+	GAlt         float32 `json: "galt"`
+	InHg         float32 `json: "inhg"`
+	AltT         float32 `json: "altt"`
+	Call         string  `json: "call"`
+	Lat          float32 `json: "lat"`
+	Long         float32 `json: "long"`
+	PosTime      uint64  `json: "postime"`
+	Mlat         bool    `json: "mlat"`
+	Tisb         bool    `json: "tisb"`
+	Spd          float32 `json: "spd"`
+	Trak         float32 `json: "trak"`
+	TrkH         bool    `json: "trkh"`
+	Type         string  `json: "type"`
+	Mdl          string  `json: "mdl"`
+	Man          string  `json: "man"`
+	CNun         string  `json: "cnun"`
+	Op           string  `json: "op"`
+	OpIcao       string  `json: "opicao"`
+	Sqk          string  `json: "sqk"`
+	Help         bool    `json: "help"`
+	Vsi          int     `json: "vsi"`
+	VsiT         int     `json: "vsit"`
+	Dst          float32 `json: "dst"`
+	Brng         float32 `json: "brng"`
+	WTC          int     `json:"wtc"`
+	Species      float32 `json: "species"`
+	Engines      string  `json: "engines"`
+	EngType      int     `json: "engtype"`
+	EngMount     int     `json: "engmount"`
+	Mil          bool    `json: "mil"`
+	Cou          string  `json: "cou"`
+	HasPic       bool    `json: "haspic"`
+	Interested   bool    `json: "interested"`
+	FlightsCount int     `json: "flightcount"`
+	Gnd          bool    `json: "gnd"`
+	SpdTyp       int     `json: "spdtyp"`
+	CallSus      bool    `json: "callsus"`
+	Trt          int     `json: "trt"`
+	Year         string  `json: "year"`
 }
