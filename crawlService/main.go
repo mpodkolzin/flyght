@@ -27,11 +27,8 @@ func main() {
 	resp, err := http.Get(adsbExchangeURL)
 
 	if err != nil {
+		log.Fatal("Could not read adsb stream")
 		panic(err)
-	} else {
-		fmt.Println("Error occured")
-		fmt.Println("Error occ")
-
 	}
 	defer resp.Body.Close()
 
@@ -45,11 +42,10 @@ func main() {
 		log.Fatal(err.Error())
 		panic(err)
 
-	} else {
 	}
 
 	//p, err := kafka.NewProducer(&kafka.ConfigMap{"bootstrap.servers": "10.4.200.9:9092"})
-	topic := "test_go"
+	topic := "adsb_topic"
 	p, err := publisher.NewPublisher(topic)
 	if err != nil {
 		panic(err)
@@ -58,16 +54,18 @@ func main() {
 	}
 
 	//fmt.Println(data["acList"])
-	for _, ac := range data.AcList {
+	func() {
+		for _, ac := range data.AcList {
 
-		acJson, _ := json.Marshal(&ac)
+			acJson, _ := json.Marshal(&ac)
 
-		fmt.Println("----------------------------Sending message to kafka queue-------------------------------")
+			fmt.Println("----------------------------Sending message to kafka queue-------------------------------")
 
-		//p.Producer.ProduceChannel() <- &kafka.Message{TopicPartition: kafka.TopicPartition{Topic: &topic, Partition: kafka.PartitionAny}, Value: []byte(acJson)}
-		p.Publish(acJson)
-		fmt.Println(ac)
-	}
-	p.Producer.Close()
+			//p.Producer.ProduceChannel() <- &kafka.Message{TopicPartition: kafka.TopicPartition{Topic: &topic, Partition: kafka.PartitionAny}, Value: []byte(acJson)}
+			p.Publish(acJson)
+			fmt.Println(ac)
+		}
+		p.Producer.Close()
+	}()
 
 }
