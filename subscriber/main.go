@@ -7,7 +7,6 @@ import (
 	"log"
 
 	"github.com/confluentinc/confluent-kafka-go/kafka"
-	"gopkg.in/olivere/elastic.v5"
 )
 
 const (
@@ -88,7 +87,6 @@ func main() {
 		if ev == nil {
 			continue
 		}
-
 		switch e := ev.(type) {
 		case *kafka.Message:
 			fmt.Printf("Received message, %s\n", string(e.Value))

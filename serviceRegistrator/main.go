@@ -24,6 +24,7 @@ func unregisterHandler(w http.ResponseWriter, r *http.Request) {
 	log.Println("unregister called1")
 	registrator.Unregister()
 }
+
 func pingHandler(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	log.Println("ping called")
