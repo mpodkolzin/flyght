@@ -1,10 +1,11 @@
 package main
 
 import (
-	//"github.com/olivere/elastic"
 	"context"
 	"fmt"
 	"log"
+
+	"github.com/olivere/elastic"
 
 	"github.com/confluentinc/confluent-kafka-go/kafka"
 )

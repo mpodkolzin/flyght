@@ -12,9 +12,9 @@ type KafkaPublisher struct {
 	Topic    string
 }
 
-func NewPublisher(topic string) (*KafkaPublisher, error) {
+func NewPublisher(topic string, bootstrapServers string) (*KafkaPublisher, error) {
 
-	p, err := kafka.NewProducer(&kafka.ConfigMap{"bootstrap.servers": "10.4.200.9:9092"})
+	p, err := kafka.NewProducer(&kafka.ConfigMap{"bootstrap.servers": bootstrapServers})
 	if err != nil {
 		return nil, err
 	}

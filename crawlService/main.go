@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"flyght/adsb"
+	"flyght/natgeo"
 	"flyght/publisher"
 	"flyght/publisher/kafkaPublisher"
 	"fmt"
@@ -10,7 +11,6 @@ import (
 	"log"
 	"net"
 	"net/http"
-	"os"
 )
 
 func PingHandler(w http.ResponseWriter, r *http.Request) {
@@ -28,16 +28,29 @@ const (
 	adsbBaseURL     = "http://public-api.adsbexchange.com/VirtualRadar/AircraftList.json"
 	adsbTcpEndpoint = "pub-vrs.adsbexchange.com:32030"
 	adsbTopic       = "adsb_topic"
+	defaultPort     = "8080"
 )
 
 func main() {
 
-	port := os.Getenv("CRAWLER_PORT")
-	if port == "" {
-		port = "8080"
+	//port := os.Getenv("CRAWLER_PORT")
+	if natgeo.ConfigServer == nil {
+		log.Fatal("ConfigServer does not work")
+	}
+	port, _ := natgeo.ConfigServer.GetValue("CRAWLER_PORT1")
+	//if port == "" {
+	//	port = defaultPort
+	//}
+	
+	//port := defaultPort
+
+	brokerList, err := natgeo.ConfigServer.GetValue("KAFKA_CONNECT")
+	log.Println(brokerList)
+	if err != nil {
+		panic(err)
 	}
 
-	adsbPublisher, err := kafkaPublisher.NewPublisher(adsbTopic)
+	adsbPublisher, err := kafkaPublisher.NewPublisher(adsbTopic, brokerList)
 	defer adsbPublisher.Producer.Close()
 
 	if err != nil {
@@ -70,9 +83,9 @@ func crawlTcp(publiser publisher.Publisher) error {
 		return err
 	}
 
-	for _, ac := range msg.AcList {
-		fmt.Printf("Icao: %s, alt: %f \n", ac.Icao, ac.Alt)
-	}
+	//for _, ac := range msg.AcList {
+	//	fmt.Printf("Icao: %s, alt: %f \n", ac.Icao, ac.Alt)
+	//}
 
 	fmt.Println("Ac count: ", len(msg.AcList))
 
