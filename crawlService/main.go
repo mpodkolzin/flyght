@@ -15,6 +15,7 @@ import (
 
 func PingHandler(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
+	fmt.Fprintf(w, "Ok, I'm alive")
 
 }
 
@@ -37,6 +38,7 @@ func main() {
 	}
 
 	adsbPublisher, err := kafkaPublisher.NewPublisher(adsbTopic)
+	defer adsbPublisher.Producer.Close()
 
 	if err != nil {
 		panic(err)
@@ -44,8 +46,6 @@ func main() {
 		fmt.Println(err)
 	}
 	go crawlTcp(adsbPublisher)
-
-	defer adsbPublisher.Producer.Close()
 
 	http.HandleFunc("/ping", PingHandler)
 	http.ListenAndServe(":"+port, nil)
@@ -71,7 +71,7 @@ func crawlTcp(publiser publisher.Publisher) error {
 	}
 
 	for _, ac := range msg.AcList {
-		fmt.Printf("Icao: %s, lat: %f \n", ac.Icao, ac.Lat)
+		fmt.Printf("Icao: %s, alt: %f \n", ac.Icao, ac.Alt)
 	}
 
 	fmt.Println("Ac count: ", len(msg.AcList))

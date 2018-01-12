@@ -14,7 +14,7 @@ type KafkaPublisher struct {
 
 func NewPublisher(topic string) (*KafkaPublisher, error) {
 
-	p, err := kafka.NewProducer(&kafka.ConfigMap{"bootstrap.servers": "127.0.0.1:9092"})
+	p, err := kafka.NewProducer(&kafka.ConfigMap{"bootstrap.servers": "10.4.200.9:9092"})
 	if err != nil {
 		return nil, err
 	}

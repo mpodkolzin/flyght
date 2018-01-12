@@ -1,0 +1,5 @@
+package natgeo
+
+import (
+	"fmt"
+)
