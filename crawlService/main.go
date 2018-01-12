@@ -8,55 +8,62 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
+	"net"
 	"net/http"
+	"os"
 )
 
-func handler(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("Hello world")
-	w.Write([]byte("Hello world"))
+func PingHandler(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 
 }
 
-var latLonPartitions []string {
-	"lat=33.433638&lng=-112.008113"
+var latLonPartitions []string = []string{
+	"lat=33.433638&lng=-112.008113",
 }
-
 
 const (
 	adsbExchangeURL = "http://public-api.adsbexchange.com/VirtualRadar/AircraftList.json?lat=33.433638&lng=-112.008113&fDstL=0&fDstU=100"
 	adsbBaseURL     = "http://public-api.adsbexchange.com/VirtualRadar/AircraftList.json"
 	adsbTcpEndpoint = "pub-vrs.adsbexchange.com:32030"
+	adsbTopic       = "adsb_topic"
 )
-
 
 func main() {
 
-	topic := "adsb_topic"
-	adsbPublisher, err := publisher.NewPublisher(topic)
-	defer adsbPublisher.Pro
+	port := os.Getenv("CRAWLER_PORT")
+	if port == "" {
+		port = "8080"
+	}
+
+	adsbPublisher, err := kafkaPublisher.NewPublisher(adsbTopic)
+
 	if err != nil {
 		panic(err)
 	} else {
 		fmt.Println(err)
 	}
+	go crawlTcp(adsbPublisher)
 
+	defer adsbPublisher.Producer.Close()
+
+	http.HandleFunc("/ping", PingHandler)
+	http.ListenAndServe(":"+port, nil)
 
 }
 
-
-func crawlTcp(publiser Publisher) error {
+func crawlTcp(publiser publisher.Publisher) error {
 
 	conn, err := net.Dial("tcp", adsbTcpEndpoint)
 	if err != nil {
-		fmt.Println(err1.Error())
+		fmt.Println(err.Error())
 	}
 	defer conn.Close()
 
 	d := json.NewDecoder(conn)
 
-    var msg adsb.AdsbResponse
-	err := d.Decode(&msg)
+	var msg adsb.AdsbResponse
+	err = d.Decode(&msg)
 
 	if err != nil {
 		log.Fatal(err.Error())
@@ -64,7 +71,7 @@ func crawlTcp(publiser Publisher) error {
 	}
 
 	for _, ac := range msg.AcList {
-		fmt.Printf("Icao: %s, lat: %f \n", ac.Icao, ac.Lat);
+		fmt.Printf("Icao: %s, lat: %f \n", ac.Icao, ac.Lat)
 	}
 
 	fmt.Println("Ac count: ", len(msg.AcList))
@@ -73,7 +80,7 @@ func crawlTcp(publiser Publisher) error {
 
 }
 
-func crawlHttp(publisher Publisher) error {
+func crawlHttp(publisher publisher.Publisher) error {
 
 	fmt.Println("Reading plane list")
 	resp, err := http.Get(adsbExchangeURL)
@@ -92,13 +99,13 @@ func crawlHttp(publisher Publisher) error {
 
 	if err != nil {
 		log.Fatal(err.Error())
-		return err;
+		return err
 	}
 
 	for _, ac := range data.AcList {
 		acJson, _ := json.Marshal(&ac)
 		fmt.Println("----------------------------Sending message to kafka queue-------------------------------")
-		p.Publish(acJson)
+		publisher.Publish(acJson)
 	}
 
 	return nil
