@@ -33,16 +33,13 @@ const (
 
 func main() {
 
-	//port := os.Getenv("CRAWLER_PORT")
 	if natgeo.ConfigServer == nil {
 		log.Fatal("ConfigServer does not work")
 	}
-	port, _ := natgeo.ConfigServer.GetValue("CRAWLER_PORT1")
-	//if port == "" {
-	//	port = defaultPort
-	//}
-	
-	//port := defaultPort
+	port, _ := natgeo.ConfigServer.GetValue("CRAWLER_PORT1sd")
+	if port == "" {
+		port = defaultPort
+	}
 
 	brokerList, err := natgeo.ConfigServer.GetValue("KAFKA_CONNECT")
 	log.Println(brokerList)
